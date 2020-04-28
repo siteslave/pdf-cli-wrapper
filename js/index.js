@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 exports.__esModule = true;
 //const Document = require('node-pdfbox');
 var path = require("path");
@@ -22,7 +33,9 @@ var Commander = {
         return { processor: 'sign', args: sArgs };
     },
     embedFormFields: function (pdfPath, fieldArray, outPdfPath, options) {
-        var jsonFilePath = getTempFilePath('json', 'tempAcroformJson_');
+        var strRandom = Math.round(Math.random() * 1000000000000);
+        var rndFile = "tempAcroformJson_" + strRandom + "_";
+        var jsonFilePath = getTempFilePath('json', rndFile);
         var sArgs = ['-jar', pdfGenPath, 'fill', pdfPath, jsonFilePath, outPdfPath, fontPath];
         if (options && options.flatten) {
             sArgs.push('-flatten');
@@ -41,72 +54,72 @@ var Commander = {
             });
         });
     },
-    // addImages(pdfPathOrBuffer: any, imgPathArray: any, options: any) {
-    //   options = options ? { ...options } : {}//clone
-    //   const sArgs = ['-jar', pdfGenPath, 'add-image']
-    //   const fromFile = pdfPathOrBuffer.constructor == String
-    //   let toBuffer = false
-    //   let deleteOut = false
-    //   let promise = Promise.resolve(pdfPathOrBuffer)
-    //   const tempPath = getTempFilePath('pdf', 'addImages')
-    //   const imagePaths = []
-    //   let buffDelete = null
-    //   function cleanup(x?) {
-    //     if (deleteOut && options.out == tempPath) {
-    //       fs.unlink(options.out, e => e)
-    //     }
-    //     imagePaths.forEach(item => {
-    //       if (item.isBase64) fs.unlink(item.path, e => e)
-    //     })
-    //     if (buffDelete) {
-    //       fs.unlink(buffDelete, e => e)
-    //     }
-    //     return x
-    //   }
-    //   //discover pdf or buffer to pdf-file
-    //   if (fromFile) {
-    //     sArgs.push(pdfPathOrBuffer)
-    //     deleteOut = options.toBuffer || !options.out
-    //     options.out = deleteOut ? tempPath : options.out
-    //   } else {
-    //     deleteOut = true
-    //     toBuffer = !options.out
-    //     options.out = options.out || tempPath
-    //     promise = promise.then(() => bufferToFile(pdfPathOrBuffer, 'pdf', 'addImages'))
-    //       .then(buffPath => {
-    //         buffDelete = buffPath
-    //         sArgs.push(buffPath)
-    //       })
-    //   }
-    //   if (options.toBuffer) {
-    //     toBuffer = options.toBuffer
-    //     delete options.toBuffer
-    //   }
-    //   //add image args (possibly cast base64 to file)
-    //   return promise.then(() => {
-    //     const promises = []
-    //     if (imgPathArray.constructor != Array) {
-    //       imgPathArray = [imgPathArray]
-    //     }
-    //     imgPathArray.forEach(item => {
-    //       promises.push(
-    //         imgDefToPath(item)
-    //           .then(imgPath => {
-    //             imagePaths.push({ path: imgPath, isBase64: item != imgPath })
-    //             sArgs.push(imgPath)
-    //           })
-    //       )
-    //     })
-    //     return Promise.all(promises)
-    //   })
-    //     .then(() => {
-    //       opsOntoSpawnArgs(options, sArgs)
-    //       return {
-    //         processor: 'addImages', cleanup: cleanup, args: sArgs,
-    //         toBuffer: toBuffer, deleteOut: deleteOut, out: options.out
-    //       }
-    //     })
-    // },
+    addImages: function (pdfPathOrBuffer, imgPathArray, options) {
+        options = options ? __assign({}, options) : {}; //clone
+        var sArgs = ['-jar', pdfGenPath, 'add-image'];
+        var fromFile = pdfPathOrBuffer.constructor == String;
+        var toBuffer = false;
+        var deleteOut = false;
+        var promise = Promise.resolve(pdfPathOrBuffer);
+        var tempPath = getTempFilePath('pdf', 'addImages');
+        var imagePaths = [];
+        var buffDelete = null;
+        function cleanup(x) {
+            if (deleteOut && options.out == tempPath) {
+                fs.unlink(options.out, function (e) { return e; });
+            }
+            imagePaths.forEach(function (item) {
+                if (item.isBase64)
+                    fs.unlink(item.path, function (e) { return e; });
+            });
+            if (buffDelete) {
+                fs.unlink(buffDelete, function (e) { return e; });
+            }
+            return x;
+        }
+        //discover pdf or buffer to pdf-file
+        if (fromFile) {
+            sArgs.push(pdfPathOrBuffer);
+            deleteOut = options.toBuffer || !options.out;
+            options.out = deleteOut ? tempPath : options.out;
+        }
+        else {
+            deleteOut = true;
+            toBuffer = !options.out;
+            options.out = options.out || tempPath;
+            promise = promise.then(function () { return bufferToFile(pdfPathOrBuffer, 'pdf', 'addImages'); })
+                .then(function (buffPath) {
+                buffDelete = buffPath;
+                sArgs.push(buffPath);
+            });
+        }
+        if (options.toBuffer) {
+            toBuffer = options.toBuffer;
+            delete options.toBuffer;
+        }
+        //add image args (possibly cast base64 to file)
+        return promise.then(function () {
+            var promises = [];
+            if (imgPathArray.constructor != Array) {
+                imgPathArray = [imgPathArray];
+            }
+            imgPathArray.forEach(function (item) {
+                promises.push(imgDefToPath(item)
+                    .then(function (imgPath) {
+                    imagePaths.push({ path: imgPath, isBase64: item != imgPath });
+                    sArgs.push(imgPath);
+                }));
+            });
+            return Promise.all(promises);
+        })
+            .then(function () {
+            opsOntoSpawnArgs(options, sArgs);
+            return {
+                processor: 'addImages', cleanup: cleanup, args: sArgs,
+                toBuffer: toBuffer, deleteOut: deleteOut, out: options.out
+            };
+        });
+    },
     getFormFields: function (pdfPath) {
         return { processor: 'getFormFields', args: ['-jar', pdfGenPath, 'read', pdfPath] };
     }
@@ -116,15 +129,14 @@ var Processor = {
         return promiseJavaSpawn(command.args)
             .then(function () { });
     },
-    // addImages: function (command: any) {
-    //   return promiseJavaSpawn(command.args)
-    //     .then(res => command.toBuffer ? fileToBuffer(command.out, command.deleteOut) : res)
-    //     .then(x => command.cleanup(x))
-    //     .catch(e => {
-    //       command.cleanup()
-    //       throw e
-    //     })
-    // },
+    addImages: function (command) {
+        return promiseJavaSpawn(command.args)
+            .then(function (res) { return command.toBuffer ? fileToBuffer(command.out, command.deleteOut) : res; })
+            .then(function (x) { return command.cleanup(x); })["catch"](function (e) {
+            command.cleanup();
+            throw e;
+        });
+    },
     embedFormFields: function (command) {
         return promiseJavaSpawn(command.args)
             .then(function (data) {
@@ -324,11 +336,11 @@ var PdfCliWrapper = /** @class */ (function () {
         height : default is image height
       }
     */
-    // static addImages(pdfPathOrBuffer, imgPathArray, options) {
-    //   let promise = Commander.addImages(pdfPathOrBuffer, imgPathArray, options)
-    //   let command = { cleanup: () => 0 }//foo
-    //   return promise.then(command => Processor.addImages(command))
-    // }
+    PdfCliWrapper.addImages = function (pdfPathOrBuffer, imgPathArray, options) {
+        var promise = Commander.addImages(pdfPathOrBuffer, imgPathArray, options);
+        var command = { cleanup: function () { return 0; } }; //foo
+        return promise.then(function (command) { return Processor.addImages(command); });
+    };
     PdfCliWrapper.promiseDelete = function (path, ignoreFileNotFound) {
         return new Promise(function (res, rej) {
             fs.unlink(path, function (e) {

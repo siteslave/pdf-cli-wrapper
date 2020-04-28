@@ -60,5 +60,6 @@ export declare class PdfCliWrapper {
         height : default is image height
       }
     */
+    static addImages(pdfPathOrBuffer: any, imgPathArray: any, options: any): Promise<any>;
     static promiseDelete(path: any, ignoreFileNotFound: any): Promise<unknown>;
 }
