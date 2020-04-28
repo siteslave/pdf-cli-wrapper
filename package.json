@@ -1,0 +1,34 @@
+{
+  "name": "pdf-cli-wrapper",
+  "version": "0.0.1",
+  "description": "A wrapper for making PDFBox CLI commands",
+  "main": "index.js",
+  "typings": "js/index.d.ts",
+  "scripts": {
+    "build": "tsc ts/* --outDir js --declaration true --lib ES6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/siteslave/pdf-cli-wrapper.git"
+  },
+  "keywords": [
+    "pdfbox",
+    "sign",
+    "encrypt",
+    "decrypt",
+    "certificate",
+    "pdf"
+  ],
+  "author": "Satit Rianpit",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/siteslave/pdf-cli-wrapper/issues"
+  },
+  "homepage": "https://github.com/siteslave/pdf-cli-wrapper",
+  "devDependencies": {
+    "typescript": "^3.3.1"
+  },
+  "dependencies": {
+    "@types/node": "^10.12.21"
+  }
+}
