@@ -8,7 +8,7 @@ const fontPath = path.join(__dirname, '../libs/fonts/Sarabun-Regular.ttf')
 
 function opsOntoSpawnArgs(options: any, sArgs: any) {
   for (let name in options) {
-    if (!options[name] || !options[name].toString) continue;//value not a string, skip it
+    //if (!options[name] || !options[name].toString) continue;//value not a string, skip it
     sArgs.push('-' + name)
     sArgs.push(options[name].toString())
   }

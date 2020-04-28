@@ -4,7 +4,7 @@ const PdfCliWrapper = require('../index');
 const readablePdf = path.join(__dirname, 'template.pdf')
 const outputPdf = path.join(__dirname, 'out/filled.pdf')
 const options = {
-  x: 314.663,
+  x: 100.663,
   y: 142.162,
   page: 0,
   width: 129.62,
