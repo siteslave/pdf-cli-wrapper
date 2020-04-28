@@ -21,7 +21,9 @@ const Commander = {
   },
 
   embedFormFields(pdfPath: any, fieldArray: any, outPdfPath: string, options: any) {
-    const jsonFilePath = getTempFilePath('json', 'tempAcroformJson_')
+    const strRandom = Math.round(Math.random() * 1000000000000);
+    const rndFile = `tempAcroformJson_${strRandom}_`;
+    const jsonFilePath = getTempFilePath('json', rndFile)
     const sArgs = ['-jar', pdfGenPath, 'fill', pdfPath, jsonFilePath, outPdfPath, fontPath]
 
     if (options && options.flatten) {
