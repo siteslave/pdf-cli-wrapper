@@ -136,6 +136,11 @@ const Commander = {
 }
 
 const Processor = {
+  /**
+   * usage : resources/pdfA3.pdf https://time-test.teda.th resources/eservice.p12 xxxxxxx PKCS12 1
+   * @param inputPdf tsaUrl keyStoreFile keyStorePassword PKCS12 1
+   * 
+   */
   sign: function (command: any) {
     return promiseJavaSpawn(command.args)
       .then(() => { })
